@@ -24,6 +24,7 @@
             --spacing-xl: 80px;
             --border-radius: 12px;
             --transition: all 0.3s ease;
+            --nav-height: 64px;
         }
 
         /* === BASE STYLES === */
@@ -45,9 +46,14 @@
             overflow-x: hidden;
         }
 
+        body.no-scroll {
+            overflow: hidden;
+        }
+
         section {
             padding: var(--spacing-xl) 0;
             position: relative;
+            scroll-margin-top: calc(var(--nav-height) + 8px);
         }
 
         .container {
@@ -244,6 +250,7 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            padding-top: calc(var(--nav-height) + var(--spacing-sm));
         }
 
         .hero::before {
@@ -308,7 +315,7 @@
         }
 
         .hero h1 {
-            font-size: 4rem;
+            font-size: clamp(2.4rem, 6vw, 4rem);
             margin-bottom: var(--spacing-sm);
             animation: fadeInUp 1s ease;
         }
@@ -640,7 +647,7 @@
         /* === PROJECTS SECTION === */
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: var(--spacing-lg);
             margin-top: var(--spacing-lg);
         }
@@ -914,6 +921,13 @@
             .hero-content { text-align: left; }
         }
 
+        @media (min-width: 1400px) {
+            .container { max-width: 1300px; }
+            .hero-grid { grid-template-columns: 1.4fr 1fr; gap: calc(var(--spacing-xl) + 12px); }
+            .hero-visual { max-width: 520px; }
+            .section-title { font-size: 2.8rem; }
+        }
+
         @media (max-width: 992px) {
             h1 {
                 font-size: 3rem;
@@ -942,6 +956,23 @@
                 display: block;
             }
             
+            .nav-links.open {
+                position: absolute;
+                top: 52px;
+                left: 0;
+                right: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding: var(--spacing-md);
+                background: rgba(10, 10, 10, 0.95);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                z-index: 1001;
+            }
+
+            .nav-links.open a::after { width: 0; }
             .hero h1 {
                 font-size: 2.5rem;
             }
@@ -996,6 +1027,18 @@
             .skills-categories {
                 grid-template-columns: 1fr;
             }
+            section { padding: 48px 0; }
+            .hero-stats { gap: 12px; }
+            .hero-stat { padding: 8px 12px; font-size: 0.85rem; }
+            .tech-tag { font-size: 0.75rem; }
+        }
+
+        @media (max-width: 420px) {
+            .container { width: 94%; }
+            h1 { font-size: 1.8rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .project-card { padding: 16px; }
+            .education-card { padding: 16px; }
         }
     </style>
 </head>
@@ -1016,7 +1059,7 @@
                 <li><a href="#contact">Contact</a></li>
             </ul>
             
-            <div class="mobile-menu">
+            <div class="mobile-menu" aria-label="Menu" aria-expanded="false" role="button">
                 <i class="fas fa-bars"></i>
             </div>
         </div>
@@ -1367,7 +1410,7 @@
                         <i class="fas fa-envelope"></i>
                     </a>
                 </div>
-                <p class="copyright">© 2025 Rahul Gond. All Rights Reserved.</p>
+                <p class="copyright">© 2023 Rahul Gond. All Rights Reserved.</p>
             </div>
         </div>
     </footer>
@@ -1400,7 +1443,26 @@
         const navLinks = document.querySelector('.nav-links');
         
         mobileMenu.addEventListener('click', () => {
-            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+            const willOpen = !navLinks.classList.contains('open');
+            navLinks.classList.toggle('open', willOpen);
+            document.body.classList.toggle('no-scroll', willOpen);
+            mobileMenu.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        });
+
+        // Close the drawer on link click and on resize to desktop
+        navLinks.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', () => {
+                navLinks.classList.remove('open');
+                document.body.classList.remove('no-scroll');
+                mobileMenu.setAttribute('aria-expanded', 'false');
+            });
+        });
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                navLinks.classList.remove('open');
+                document.body.classList.remove('no-scroll');
+                mobileMenu.setAttribute('aria-expanded', 'false');
+            }
         });
 
         // Form Submission (removed)
@@ -1604,5 +1666,4 @@
         }
     </script>
 </body>
-
 </html>
